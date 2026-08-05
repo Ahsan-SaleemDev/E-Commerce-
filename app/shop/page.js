@@ -1,186 +1,97 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import Toast from "../components/Toast";
-import { CartProvider, useCart } from "../components/CartProvider";
+import Toasts from "../components/Toasts";
+import ProductCard from "../components/ProductCard";
+import { StoreProvider } from "../components/Providers";
 import { products, categories } from "../data/products";
-import Link from "next/link";
 
-function ShopContent() {
-  const { addToCart, cartCount, toast, hideToast } = useCart();
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [sortBy, setSortBy] = useState("popular");
+function ShopInner() {
+  const [cat, setCat] = useState("All");
+  const [sort, setSort] = useState("popular");
+  const [minP, setMinP] = useState("");
+  const [maxP, setMaxP] = useState("");
+  const [rating, setRating] = useState(0);
 
-  const filtered =
-    selectedCategory === "All"
-      ? products
-      : products.filter((p) => p.category === selectedCategory);
-
-  const sorted = [...filtered].sort((a, b) => {
-    if (sortBy === "price-low") return a.price - b.price;
-    if (sortBy === "price-high") return b.price - a.price;
-    if (sortBy === "rating") return b.rating - a.rating;
-    return b.reviews - a.reviews;
-  });
+  const filtered = useMemo(() => {
+    let list = cat === "All" ? [...products] : products.filter((p) => p.category === cat);
+    if (minP) list = list.filter((p) => p.price >= Number(minP));
+    if (maxP) list = list.filter((p) => p.price <= Number(maxP));
+    if (rating) list = list.filter((p) => p.rating >= rating);
+    if (sort === "price-low") list.sort((a, b) => a.price - b.price);
+    else if (sort === "price-high") list.sort((a, b) => b.price - a.price);
+    else if (sort === "rating") list.sort((a, b) => b.rating - a.rating);
+    else list.sort((a, b) => b.reviews - a.reviews);
+    return list;
+  }, [cat, sort, minP, maxP, rating]);
 
   return (
     <>
-      <Header cartCount={cartCount} />
-
+      <Header />
       <div className="page-banner">
         <div className="container">
-          <h1>Shop</h1>
+          <h1>Shop All Products</h1>
           <div className="breadcrumb">
-            <Link href="/">Home</Link>
-            <i className="ri-arrow-right-s-line"></i>
-            <span>Shop</span>
+            <Link href="/">Home</Link><i className="ri-arrow-right-s-line"></i><span>Shop</span>
           </div>
         </div>
       </div>
-
       <div className="container">
         <div className="shop-layout">
-          {/* Sidebar */}
-          <aside className="sidebar-filter">
-            <div className="filter-group">
+          <aside className="shop-sidebar">
+            <div className="filter-block">
               <h3>Categories</h3>
-              <label>
-                <input
-                  type="radio"
-                  name="category"
-                  checked={selectedCategory === "All"}
-                  onChange={() => setSelectedCategory("All")}
-                />
-                All Products
-              </label>
-              {categories.map((cat) => (
-                <label key={cat.name}>
-                  <input
-                    type="radio"
-                    name="category"
-                    checked={selectedCategory === cat.name}
-                    onChange={() => setSelectedCategory(cat.name)}
-                  />
-                  {cat.name}
-                </label>
+              <label><input type="radio" name="cat" checked={cat === "All"} onChange={() => setCat("All")} /> All Products <span className="count">{products.length}</span></label>
+              {categories.map((c) => (
+                <label key={c.name}><input type="radio" name="cat" checked={cat === c.name} onChange={() => setCat(c.name)} /> {c.name} <span className="count">{c.count}</span></label>
               ))}
             </div>
-
-            <div className="filter-group">
+            <div className="filter-block">
               <h3>Price Range</h3>
-              <div className="price-range">
-                <input type="number" placeholder="Min" min="0" />
+              <div className="price-inputs">
+                <input type="number" placeholder="Min" value={minP} onChange={(e) => setMinP(e.target.value)} />
                 <span>—</span>
-                <input type="number" placeholder="Max" min="0" />
+                <input type="number" placeholder="Max" value={maxP} onChange={(e) => setMaxP(e.target.value)} />
               </div>
             </div>
-
-            <div className="filter-group">
+            <div className="filter-block">
               <h3>Rating</h3>
               {[4, 3, 2, 1].map((r) => (
                 <label key={r}>
-                  <input type="checkbox" />
-                  {[...Array(5)].map((_, i) => (
-                    <i
-                      key={i}
-                      className={i < r ? "ri-star-fill" : "ri-star-line"}
-                      style={{
-                        fontSize: 14,
-                        color: i < r ? "var(--accent)" : "var(--gray-4)",
-                      }}
-                    ></i>
-                  ))}
-                  <span>& Up</span>
+                  <input type="radio" name="rating" checked={rating === r} onChange={() => setRating(rating === r ? 0 : r)} />
+                  <span className="stars-filter">{[...Array(5)].map((_, i) => <i key={i} className={i < r ? "ri-star-fill" : "ri-star-line"} />)}</span>
+                  & Up
                 </label>
               ))}
             </div>
           </aside>
-
-          {/* Products */}
           <div>
-            <div className="shop-header">
-              <p>
-                Showing <strong>{sorted.length}</strong> products
-              </p>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <div className="shop-top">
+              <p>Showing <strong>{filtered.length}</strong> of {products.length} products</p>
+              <select value={sort} onChange={(e) => setSort(e.target.value)}>
                 <option value="popular">Most Popular</option>
                 <option value="rating">Highest Rated</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
+                <option value="price-low">Price: Low → High</option>
+                <option value="price-high">Price: High → Low</option>
               </select>
             </div>
-
             <div className="products-grid">
-              {sorted.map((product) => (
-                <div className="product-card" key={product.id}>
-                  <div className="image-wrapper">
-                    <img src={product.image} alt={product.name} />
-                    {product.tag && (
-                      <span className={`tag ${product.tag}`}>
-                        {product.tag === "sale" ? "SALE" : "NEW"}
-                      </span>
-                    )}
-                    <div className="actions">
-                      <button>
-                        <i className="ri-heart-3-line"></i>
-                      </button>
-                      <Link href={`/shop/${product.id}`}>
-                        <i className="ri-eye-line"></i>
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="info">
-                    <span className="category">{product.category}</span>
-                    <h3>{product.name}</h3>
-                    <div className="rating">
-                      {[...Array(5)].map((_, i) => (
-                        <i
-                          key={i}
-                          className={
-                            i < Math.floor(product.rating)
-                              ? "ri-star-fill"
-                              : "ri-star-line"
-                          }
-                        ></i>
-                      ))}
-                      <span>({product.reviews})</span>
-                    </div>
-                    <div className="price-row">
-                      <div className="price">
-                        ${product.price.toFixed(2)}
-                        {product.oldPrice && (
-                          <span className="old">
-                            ${product.oldPrice.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                      <button
-                        className="add-btn"
-                        onClick={() => addToCart(product)}
-                      >
-                        <i className="ri-add-line"></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              {filtered.map((p) => <ProductCard key={p.id} product={p} />)}
             </div>
+            {filtered.length === 0 && (
+              <div className="empty-state"><div className="empty-icon"><i className="ri-search-line"></i></div><h2>No products found</h2><p>Try adjusting your filters</p></div>
+            )}
           </div>
         </div>
       </div>
-
       <Footer />
-      <Toast message={toast.message} isVisible={toast.visible} onClose={hideToast} />
+      <Toasts />
     </>
   );
 }
 
 export default function ShopPage() {
-  return (
-    <CartProvider>
-      <ShopContent />
-    </CartProvider>
-  );
+  return <StoreProvider><ShopInner /></StoreProvider>;
 }
