@@ -1,85 +1,64 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Footer() {
   return (
-    <div className="part-10">
-      <div className="top">
-        <h1>Stay in touch with us</h1>
-        <h5>Receive the latest update about our products & promotions</h5>
-        <div className="search-box">
-          <input type="text" placeholder="Your email" />
-          <button>Subscribe</button>
-        </div>
-      </div>
-      <div className="bottom">
-        <div className="top">
-          <div className="top-left">
-            <h2>Cartzilla</h2>
+    <footer className="footer">
+      <div className="container">
+        <div className="footer-grid">
+          <div className="footer-brand">
+            <Link href="/" className="logo">
+              Fresh<span>Mart</span>
+            </Link>
             <p>
-              With a wide selection of fresh produce, pantry staples, and
-              household essentials, we've got everything you need just a click
-              away.
+              Your one-stop shop for fresh groceries, organic produce, and
+              everyday essentials. Delivered fresh to your doorstep.
             </p>
-            <div className="icons">
-              <a href="">
-                <i className="ri-instagram-line"></i>
-              </a>
-              <a href="">
-                <i className="ri-facebook-fill"></i>
-              </a>
-              <a href="">
-                <i className="ri-telegram-2-line"></i>
-              </a>
-              <a href="">
-                <i className="ri-whatsapp-line"></i>
-              </a>
+            <div className="social-links">
+              <a href="#"><i className="ri-facebook-fill"></i></a>
+              <a href="#"><i className="ri-instagram-line"></i></a>
+              <a href="#"><i className="ri-twitter-x-line"></i></a>
+              <a href="#"><i className="ri-youtube-line"></i></a>
             </div>
           </div>
-          <div className="top-right">
-            <div className="box">
-              <h3>Categories</h3>
-              <a href="">Weekly sale</a>
-              <a href="">Special price</a>
-              <a href="">Easter is coming</a>
-              <a href="">Italian dinner</a>
-              <a href="">Fresh fruits</a>
-              <a href="">Exotic fruits</a>
-            </div>
-            <div className="box">
-              <h3>Company</h3>
-              <a href="">Blog and news</a>
-              <a href="">About us</a>
-              <a href="">FAQ page</a>
-              <a href="">Contact us</a>
-              <a href="">Careers</a>
-            </div>
-            <div className="box">
-              <h3>Account</h3>
-              <a href="">Your account</a>
-              <a href="">Shipping & policies</a>
-              <a href="">Refunds & replacements</a>
-              <a href="">Order tracking</a>
-              <a href="">Delivery info</a>
-              <a href="">Taxes & fees</a>
-            </div>
-            <div className="box">
-              <h3>Customer service</h3>
-              <a href="">Payment methods</a>
-              <a href="">Money back guarantee</a>
-              <a href="">Refunds & replacements</a>
-              <a href="">Order tracking</a>
-              <a href="">Delivery info</a>
-              <a href="">Shipping</a>
-            </div>
+
+          <div className="footer-col">
+            <h4>Shop</h4>
+            <Link href="/shop">All Products</Link>
+            <a href="#">Fresh Fruits</a>
+            <a href="#">Vegetables</a>
+            <a href="#">Dairy & Eggs</a>
+            <a href="#">Meat & Seafood</a>
+          </div>
+
+          <div className="footer-col">
+            <h4>Company</h4>
+            <Link href="/about">About Us</Link>
+            <Link href="/contact">Contact</Link>
+            <a href="#">Careers</a>
+            <a href="#">Blog</a>
+            <a href="#">Press</a>
+          </div>
+
+          <div className="footer-col">
+            <h4>Support</h4>
+            <a href="#">Help Center</a>
+            <a href="#">Shipping Info</a>
+            <a href="#">Returns</a>
+            <a href="#">Track Order</a>
+            <a href="#">Privacy Policy</a>
           </div>
         </div>
-        <div className="bottom">
-          <p>
-            © All rights reserved. Made with by{" "}
-            <i className="ri-heart-fill"></i> <a href="">Ahsan Mehar</a>
-          </p>
+
+        <div className="footer-bottom">
+          <span>© 2026 FreshMart. All rights reserved.</span>
+          <span>
+            Made with <i className="ri-heart-fill" style={{ color: "var(--danger)" }}></i> by{" "}
+            <a href="#">Ahsan Mehar</a>
+          </span>
         </div>
       </div>
-    </div>
+    </footer>
   );
 }
